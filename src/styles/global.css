@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+/* ---- 双主题运行时变量：浅色「叶绿纸本」/ 深色「夜林荧光」 ---- */
+:root {
+  --ground: #f0f4e9;
+  --ground-2: #e6ecdb;
+  --ink: #1c3326;
+  --ink-soft: #56695a;
+  --leaf: #2f7a4d;
+  --leaf-deep: #1f5a37;
+  --pollen: #c98f16;
+  --line: #c9d4bd;
+  --card: #f7faf1;
+  /* canvas 孢子粒子的 rgb 分量 */
+  --spore-a: 47, 122, 77;
+  --spore-b: 201, 143, 22;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0c1712;
+    --ground-2: #101f18;
+    --ink: #e2ecdf;
+    --ink-soft: #93a696;
+    --leaf: #5fbf7e;
+    --leaf-deep: #7fd49a;
+    --pollen: #e3b54a;
+    --line: #24382c;
+    --card: #12241a;
+    --spore-a: 95, 191, 126;
+    --spore-b: 227, 181, 74;
+  }
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-ground-2: var(--ground-2);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-leaf: var(--leaf);
+  --color-leaf-deep: var(--leaf-deep);
+  --color-pollen: var(--pollen);
+  --color-line: var(--line);
+  --color-card: var(--card);
+
+  --font-display: "Fraunces", Georgia, "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
+  --font-sans: "IBM Plex Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--ground);
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--ground);
+  line-height: 1.75;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--leaf) 28%, transparent);
+  color: var(--ink);
+}
+
+/* ---- 词源小标：等宽、大字距 ---- */
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--leaf);
+}
+
+/* ---- 页面加载：分层渐显 ---- */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.rise {
+  opacity: 0;
+  animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--rise-delay, 0s);
+}
+
+/* ---- 滚动渐显（配合 IntersectionObserver）---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0s);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rise, .reveal {
+    animation: none;
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

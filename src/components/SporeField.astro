@@ -1,0 +1,107 @@
+---
+// 轻量 Canvas 孢子场：缓慢上浮 + 呼吸式明灭的生命粒子，
+// prefers-reduced-motion 时静态渲染一帧。颜色取自 CSS 变量，随明暗主题自动切换。
+---
+
+<canvas
+  id="sporefield"
+  class="absolute inset-0 h-full w-full"
+  aria-hidden="true"></canvas>
+
+<script>
+  const canvas = document.getElementById('sporefield') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d')!;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  interface Spore {
+    x: number; // 0..1 相对坐标
+    y: number;
+    r: number; // 基础半径 px
+    vy: number; // 上浮速度（相对高度/帧）
+    drift: number; // 水平摆动相位
+    driftSpeed: number;
+    breath: number; // 呼吸相位
+    warm: boolean; // 少量花粉黄，其余叶绿
+  }
+
+  let spores: Spore[] = [];
+  let w = 0;
+  let h = 0;
+  let dpr = 1;
+
+  function tokenRGB(name: string): string {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+  let colA = tokenRGB('--spore-a');
+  let colB = tokenRGB('--spore-b');
+  window
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', () => {
+      colA = tokenRGB('--spore-a');
+      colB = tokenRGB('--spore-b');
+    });
+
+  function setup() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const count = Math.min(Math.floor((w * h) / 22000), 64);
+    spores = Array.from({ length: count }, () => ({
+      x: Math.random(),
+      y: Math.random(),
+      r: 1.5 + Math.random() * 4,
+      vy: 0.00018 + Math.random() * 0.00035,
+      drift: Math.random() * Math.PI * 2,
+      driftSpeed: 0.002 + Math.random() * 0.004,
+      breath: Math.random() * Math.PI * 2,
+      warm: Math.random() < 0.25,
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+    for (const s of spores) {
+      const x = (s.x + Math.sin(s.drift) * 0.015) * w;
+      const y = s.y * h;
+      const r = s.r + Math.sin(s.breath) * 0.8;
+      const a = 0.16 + 0.12 * Math.sin(s.breath);
+      const col = s.warm ? colB : colA;
+
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 3.2);
+      glow.addColorStop(0, `rgba(${col},${a})`);
+      glow.addColorStop(1, `rgba(${col},0)`);
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, r * 3.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = `rgba(${col},${a + 0.25})`;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function frame() {
+    for (const s of spores) {
+      s.y -= s.vy;
+      s.drift += s.driftSpeed;
+      s.breath += 0.015;
+      if (s.y < -0.05) s.y = 1.05;
+    }
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  setup();
+  window.addEventListener('resize', setup);
+  if (reduced) {
+    draw();
+  } else {
+    frame();
+  }
+</script>

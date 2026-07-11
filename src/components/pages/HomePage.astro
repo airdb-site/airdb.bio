@@ -1,0 +1,343 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SporeField from '../SporeField.astro';
+
+type Lang = 'zh' | 'en';
+interface Props {
+  lang?: Lang;
+}
+const { lang = 'zh' } = Astro.props;
+
+const zh = lang === 'zh';
+
+// hero 后缀轮换的数据源，也渲染进 data 属性给脚本使用
+const suffixes = zh
+  ? [
+      { suffix: 'logy', gloss: '生物学', note: '—— 关于生命的学科' },
+      { suffix: 'sphere', gloss: '生物圈', note: '—— 生命栖居的圈层' },
+      { suffix: 'graphy', gloss: '传记 · 生平', note: '—— 把生命写下来' },
+      { suffix: 'degradable', gloss: '可降解', note: '—— 来自自然，归于自然' },
+    ]
+  : [
+      { suffix: 'logy', gloss: 'Biology', note: '— the science of life' },
+      { suffix: 'sphere', gloss: 'Biosphere', note: '— the layer where life lives' },
+      { suffix: 'graphy', gloss: 'Biography', note: '— a life, written down' },
+      { suffix: 'degradable', gloss: 'Biodegradable', note: '— from nature, back to nature' },
+    ];
+
+const rootCards = zh
+  ? [
+      { word: 'logy', gloss: '生物学', note: '-logy 学科、学问。研究生命本身的科学。' },
+      { word: 'sphere', gloss: '生物圈', note: '-sphere 圈层。地球上所有生命栖居的薄薄一层。' },
+      { word: 'graphy', gloss: '传记 · 生平', note: '-graphy 书写。把一段生命写下来，就成了 bio。' },
+      { word: 'degradable', gloss: '生物可降解', note: '来自自然，归于自然。可持续的另一种表达。' },
+    ]
+  : [
+      { word: 'logy', gloss: 'Biology', note: '-logy, a field of study. The science of life itself.' },
+      { word: 'sphere', gloss: 'Biosphere', note: '-sphere, a layer. The thin shell of Earth where all life lives.' },
+      { word: 'graphy', gloss: 'Biography', note: '-graphy, writing. Write a life down and it becomes a bio.' },
+      { word: 'degradable', gloss: 'Biodegradable', note: 'From nature, back to nature — sustainability in one word.' },
+    ];
+
+const pillars = zh
+  ? [
+      {
+        id: 'science',
+        morph: '·logy',
+        title: '生命科学',
+        route: '/science',
+        lede: '生物、生命科学的世界：从一颗细胞到一整个生态系统。',
+        items: ['生物医药 · 基因 · 微生物', '合成生物学与脑科学前沿', '实验室、科研机构与开放数据'],
+      },
+      {
+        id: 'biography',
+        morph: '·graphy',
+        title: '生平印记',
+        route: '/me',
+        lede: 'biography 的缩写 —— 互联网上，bio 就是「你是谁」。',
+        items: ['创作者 · 博主的个人名片站', 'link-in-bio 导流聚合页', '与 airdb.id 呼应：身份 + 生平'],
+      },
+    ]
+  : [
+      {
+        id: 'science',
+        morph: '·logy',
+        title: 'Life Science',
+        route: '/science',
+        lede: 'The world of biology: from a single cell to entire ecosystems.',
+        items: ['Biopharma · genomics · microbiology', 'Synthetic biology & neuroscience frontiers', 'Labs, institutes and open data'],
+      },
+      {
+        id: 'biography',
+        morph: '·graphy',
+        title: 'Biography',
+        route: '/me',
+        lede: 'Short for biography — on the internet, your bio is who you are.',
+        items: ['Personal pages for creators & bloggers', 'Link-in-bio hub pages', 'Paired with airdb.id: identity + story'],
+      },
+    ];
+
+const family = zh
+  ? [
+      { domain: 'airdb.space', tag: '星辰大海 · 探索', href: 'https://airdb.space' },
+      { domain: 'airdb.bio', tag: '生物圈 · 生命（你在这里）', href: null },
+      { domain: 'airdb.dev', tag: '开发者 · 工程', href: 'https://airdb.dev' },
+      { domain: 'airdb.fund', tag: '基金 · 长期主义', href: 'https://airdb.fund' },
+      { domain: 'airdb.id', tag: '身份 · 数字名片', href: 'https://airdb.id' },
+    ]
+  : [
+      { domain: 'airdb.space', tag: 'To the stars · exploration', href: 'https://airdb.space' },
+      { domain: 'airdb.bio', tag: 'The biosphere · life (you are here)', href: null },
+      { domain: 'airdb.dev', tag: 'Developers · engineering', href: 'https://airdb.dev' },
+      { domain: 'airdb.fund', tag: 'Fund · long-termism', href: 'https://airdb.fund' },
+      { domain: 'airdb.id', tag: 'Identity · digital card', href: 'https://airdb.id' },
+    ];
+
+const roadmap = zh
+  ? [
+      { v: 'v0.1', title: '首页发芽', desc: '本页上线：词根叙事 + 三大板块导览 + 站群互链。Astro 静态构建。' },
+      { v: 'v0.2', title: '内容抽枝', desc: 'Content Collections 驱动：生命科学时间线与专题文章，Markdown 持续更新。' },
+      { v: 'v1.0', title: '开花结果', desc: '/me 个人 bio 页生成：一份 YAML，长出一张可分享的个人名片页。' },
+    ]
+  : [
+      { v: 'v0.1', title: 'Sprout', desc: 'This page ships: root-word narrative, three pillars, family links. Built with Astro.' },
+      { v: 'v0.2', title: 'Branch', desc: 'Content Collections: life-science timelines and feature articles in Markdown.' },
+      { v: 'v1.0', title: 'Bloom', desc: '/me bio pages: one YAML file grows into a shareable personal card page.' },
+    ];
+
+const t = zh
+  ? {
+      greek: '希腊语 · 本义「生命」',
+      lede: 'airdb.space 仰望星辰大海，airdb.bio 俯身凝视生命。这里是 airdb 站群的「生物圈」：从生命科学的前沿，到每一个人独一无二的生平。',
+      ctaRoot: '从一个词根开始 ↓',
+      ctaFamily: '探索 airdb 站群',
+      rootKicker: 'Etymology · 词根考',
+      rootTitle: '一个词根，长出一片词汇森林',
+      pillarKicker: 'Two meanings · 双重含义',
+      pillarTitle: 'bio 的两层含义，就是这座站的两个房间',
+      familyKicker: 'airdb constellation · 站群',
+      familyTitle: '向外是星辰大海，向内是生命家园',
+      roadKicker: 'Roadmap · 生长节奏',
+      roadTitle: '像植物一样，一节一节地长',
+    }
+  : {
+      greek: 'Greek root — “life”',
+      lede: 'airdb.space looks up to the stars; airdb.bio leans in to look at life. This is the biosphere of the airdb constellation: from the frontiers of life science to every singular life story.',
+      ctaRoot: 'Start from one root ↓',
+      ctaFamily: 'Explore the airdb sites',
+      rootKicker: 'Etymology',
+      rootTitle: 'One root grows a forest of words',
+      pillarKicker: 'Two meanings',
+      pillarTitle: 'Two meanings of bio, two rooms of this site',
+      familyKicker: 'airdb constellation',
+      familyTitle: 'Outward to the stars, inward to life',
+      roadKicker: 'Roadmap',
+      roadTitle: 'Growing the way plants do — one node at a time',
+    };
+---
+
+<Layout lang={lang} path="/">
+  <!-- ============ Hero ============ -->
+  <section class="relative flex min-h-[92vh] items-center overflow-hidden border-b border-line">
+    <SporeField />
+    <div class="relative z-10 mx-auto w-full max-w-6xl px-6 pt-36 pb-24 md:px-10">
+      <div
+        class="rise inline-flex items-center gap-3 rounded-full border border-line bg-card/70 px-4 py-1.5"
+        style="--rise-delay: 0.1s"
+      >
+        <span class="kicker">βίος · Greek root</span>
+        <span class="text-sm text-ink-soft">{t.greek}</span>
+      </div>
+
+      <h1
+        class="rise mt-9 font-display text-6xl leading-[1.05] font-normal md:text-8xl"
+        style="--rise-delay: 0.25s"
+      >
+        <span class="italic text-leaf">bio</span><span class="text-ink">·</span><span
+          class="italic text-pollen transition-opacity duration-300"
+          id="hero-suffix"
+          data-suffixes={JSON.stringify(suffixes)}>{suffixes[0].suffix}</span
+        >
+        <span class="mt-5 block text-2xl font-light text-ink-soft md:text-3xl">
+          <strong class="font-semibold text-ink transition-opacity duration-300" id="hero-gloss"
+            >{suffixes[0].gloss}</strong
+          ><span class="transition-opacity duration-300" id="hero-note"> {suffixes[0].note}</span>
+        </span>
+      </h1>
+
+      <p class="rise mt-9 max-w-xl text-ink-soft" style="--rise-delay: 0.4s">
+        {t.lede}
+      </p>
+
+      <div class="rise mt-11 flex flex-wrap gap-4" style="--rise-delay: 0.55s">
+        <a
+          href="#root"
+          class="rounded-full border border-leaf bg-leaf px-7 py-3 text-sm text-ground transition-all hover:-translate-y-0.5 hover:bg-leaf-deep"
+          >{t.ctaRoot}</a
+        >
+        <a
+          href="#family"
+          class="rounded-full border border-leaf px-7 py-3 text-sm text-leaf transition-colors hover:bg-leaf/10"
+          >{t.ctaFamily}</a
+        >
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 词根考 ============ -->
+  <section id="root" class="scroll-mt-24 py-24 md:py-32">
+    <div class="mx-auto max-w-6xl px-6 md:px-10">
+      <div class="reveal mb-14">
+        <span class="kicker">{t.rootKicker}</span>
+        <h2 class="mt-3 font-display text-3xl text-balance md:text-4xl">{t.rootTitle}</h2>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          rootCards.map((c, i) => (
+            <div
+              class="reveal group relative overflow-hidden rounded border border-line bg-card p-6 transition-all hover:-translate-y-1 hover:border-leaf"
+              style={`--reveal-delay: ${i * 0.08}s`}
+            >
+              <div class="font-display text-2xl italic">
+                <b class="font-semibold text-leaf">bio</b>
+                <span class="text-pollen">·{c.word}</span>
+              </div>
+              <p class="mt-3 mb-1 font-semibold">{c.gloss}</p>
+              <p class="text-sm text-ink-soft">{c.note}</p>
+              <div class="pointer-events-none absolute -right-8 -bottom-8 h-24 w-24 rounded-full bg-leaf/15 blur-xl transition-all group-hover:bg-leaf/25" />
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 三大板块 ============ -->
+  <section class="pb-24 md:pb-32">
+    <div class="mx-auto max-w-6xl px-6 md:px-10">
+      <div class="reveal mb-6">
+        <span class="kicker">{t.pillarKicker}</span>
+        <h2 class="mt-3 font-display text-3xl text-balance md:text-4xl">{t.pillarTitle}</h2>
+      </div>
+      {
+        pillars.map((p) => (
+          <div
+            id={p.id}
+            class="reveal grid scroll-mt-24 gap-8 border-t border-line py-14 first-of-type:border-t-0 md:grid-cols-2 md:gap-16"
+          >
+            <div>
+              <div class="font-display text-4xl italic md:text-5xl">
+                <b class="font-semibold text-leaf">bio</b>
+                <span class="text-pollen">{p.morph}</span>
+              </div>
+              <h3 class="mt-4 text-2xl font-semibold">{p.title}</h3>
+              <span class="mt-4 inline-block rounded-full border border-dashed border-line px-4 py-0.5 font-mono text-xs text-ink-soft">
+                {p.route}
+              </span>
+            </div>
+            <div>
+              <p class="mb-4 text-ink-soft">{p.lede}</p>
+              <ul>
+                {p.items.map((item, i) => (
+                  <li class="relative border-b border-dashed border-line py-2.5 pl-6 text-[0.95rem]">
+                    <span
+                      class:list={[
+                        'absolute top-1/2 left-0.5 h-1.5 w-1.5 -translate-y-1/2 rounded-full',
+                        i % 2 === 0 ? 'bg-leaf' : 'bg-pollen',
+                      ]}
+                    />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ============ 站群 ============ -->
+  <section id="family" class="scroll-mt-24 border-y border-line bg-ground-2 py-24 md:py-32">
+    <div class="mx-auto max-w-6xl px-6 md:px-10">
+      <div class="reveal mb-14">
+        <span class="kicker">{t.familyKicker}</span>
+        <h2 class="mt-3 font-display text-3xl text-balance md:text-4xl">{t.familyTitle}</h2>
+      </div>
+      <div class="reveal grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {
+          family.map((s) =>
+            s.href ? (
+              <a
+                href={s.href}
+                rel="noopener"
+                class="block rounded border border-line bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-leaf"
+              >
+                <span class="font-display font-semibold italic">{s.domain}</span>
+                <span class="mt-1 block text-sm text-ink-soft">{s.tag}</span>
+              </a>
+            ) : (
+              <div class="rounded border border-leaf bg-leaf/10 p-5">
+                <span class="font-display font-semibold text-leaf italic">{s.domain}</span>
+                <span class="mt-1 block text-sm text-ink-soft">{s.tag}</span>
+              </div>
+            )
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 路线图 ============ -->
+  <section class="py-24 md:py-32">
+    <div class="mx-auto max-w-6xl px-6 md:px-10">
+      <div class="reveal mb-10">
+        <span class="kicker">{t.roadKicker}</span>
+        <h2 class="mt-3 font-display text-3xl text-balance md:text-4xl">{t.roadTitle}</h2>
+      </div>
+      <div class="reveal">
+        {
+          roadmap.map((s) => (
+            <div class="grid grid-cols-[88px_1fr] gap-6 border-t border-dashed border-line py-6 first:border-t-0">
+              <span class="pt-0.5 font-mono text-sm text-pollen">{s.v}</span>
+              <div>
+                <h4 class="mb-1 font-semibold">{s.title}</h4>
+                <p class="text-sm text-ink-soft">{s.desc}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // hero 后缀轮换：bio + {logy, sphere, graphy, degradable}
+  const el = document.getElementById('hero-suffix')!;
+  const gloss = document.getElementById('hero-gloss')!;
+  const note = document.getElementById('hero-note')!;
+  const items: { suffix: string; gloss: string; note: string }[] = JSON.parse(
+    el.dataset.suffixes!
+  );
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let i = 0;
+
+  setInterval(() => {
+    i = (i + 1) % items.length;
+    const apply = () => {
+      el.textContent = items[i].suffix;
+      gloss.textContent = items[i].gloss;
+      note.textContent = ' ' + items[i].note;
+    };
+    if (reduced) {
+      apply();
+      return;
+    }
+    for (const n of [el, gloss, note]) n.style.opacity = '0';
+    setTimeout(() => {
+      apply();
+      for (const n of [el, gloss, note]) n.style.opacity = '1';
+    }, 320);
+  }, 3400);
+</script>
