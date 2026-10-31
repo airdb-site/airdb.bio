@@ -17,11 +17,13 @@ interface Props {
   lang?: Lang;
   /** 不带语言前缀的路径，如 '/'，用于 canonical / hreflang / 语言切换 */
   path?: string;
+  noindex?: boolean;
 }
 
 const SITE = 'https://airdb.bio';
 
 const {
+  noindex = false,
   lang = 'zh',
   path = '/',
   title = lang === 'zh' ? 'airdb.bio — 生物圈' : 'airdb.bio — The Biosphere',
@@ -75,7 +77,7 @@ const F =
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
 
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <link rel="alternate" hreflang="zh-CN" href={zhUrl} />
     <link rel="alternate" hreflang="en" href={enUrl} />
     <link rel="alternate" hreflang="x-default" href={zhUrl} />
@@ -86,16 +88,13 @@ const F =
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={`${SITE}/og.png`} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
     <meta property="og:locale" content={lang === 'zh' ? 'zh_CN' : 'en_US'} />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${SITE}/og.png`} />
   </head>
   <body>
+    <a class="skip-link" href="#main-content">{lang === 'zh' ? '跳至主要内容' : 'Skip to content'}</a>
     <header
       class="fixed top-0 right-0 left-0 z-50 border-b border-line bg-ground/80 backdrop-blur-md"
     >
@@ -115,11 +114,11 @@ const F =
           {
             nav.map((item) => (
               <a
-                href={item.href}
+                href={`${home}${item.href}`}
                 class="group hidden items-baseline gap-2 text-sm text-ink-soft transition-colors hover:text-leaf sm:flex"
               >
                 <span class="tracking-[0.12em]">{item.label}</span>
-                <span class="hidden font-mono text-[0.6rem] tracking-[0.2em] text-ink-soft/60 uppercase transition-colors group-hover:text-pollen lg:inline">
+                <span class="hidden font-mono text-[0.6rem] tracking-[0.2em] text-ink-soft uppercase transition-colors group-hover:text-pollen lg:inline">
                   {item.sub}
                 </span>
               </a>
@@ -134,9 +133,12 @@ const F =
           </a>
         </nav>
       </div>
+      <nav class="mobile-nav" aria-label={lang === 'zh' ? '页面导航' : 'Page navigation'}>
+        {nav.map((item) => <a href={`${home}${item.href}`}>{item.label}</a>)}
+      </nav>
     </header>
 
-    <main>
+    <main id="main-content">
       <slot />
     </main>
 

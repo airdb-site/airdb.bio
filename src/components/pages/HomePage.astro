@@ -95,12 +95,12 @@ const family = zh
 
 const roadmap = zh
   ? [
-      { v: 'v0.1', title: '首页发芽', desc: '本页上线：词根叙事 + 三大板块导览 + 站群互链。Astro 静态构建。' },
+      { v: 'v0.1', title: '首页发芽', desc: '本页上线：词根叙事 + 两大板块导览 + 站群互链。Astro 静态构建。' },
       { v: 'v0.2', title: '内容抽枝', desc: 'Content Collections 驱动：生命科学时间线与专题文章，Markdown 持续更新。' },
       { v: 'v1.0', title: '开花结果', desc: '/me 个人 bio 页生成：一份 YAML，长出一张可分享的个人名片页。' },
     ]
   : [
-      { v: 'v0.1', title: 'Sprout', desc: 'This page ships: root-word narrative, three pillars, family links. Built with Astro.' },
+      { v: 'v0.1', title: 'Sprout', desc: 'This page ships: root-word narrative, two pillars, family links. Built with Astro.' },
       { v: 'v0.2', title: 'Branch', desc: 'Content Collections: life-science timelines and feature articles in Markdown.' },
       { v: 'v1.0', title: 'Bloom', desc: '/me bio pages: one YAML file grows into a shareable personal card page.' },
     ];
@@ -150,7 +150,7 @@ const t = zh
       </div>
 
       <h1
-        class="rise mt-9 font-display text-6xl leading-[1.05] font-normal md:text-8xl"
+        class="rise mt-9 font-display text-[clamp(2rem,8vw,3.75rem)] leading-[1.05] font-normal md:text-8xl"
         style="--rise-delay: 0.25s"
       >
         <span class="italic text-leaf">bio</span><span class="text-ink">·</span><span
@@ -232,7 +232,7 @@ const t = zh
               </div>
               <h3 class="mt-4 text-2xl font-semibold">{p.title}</h3>
               <span class="mt-4 inline-block rounded-full border border-dashed border-line px-4 py-0.5 font-mono text-xs text-ink-soft">
-                {p.route}
+                {p.route} · {zh ? '规划中，尚未上线' : 'Planned — not yet available'}
               </span>
             </div>
             <div>
@@ -323,7 +323,7 @@ const t = zh
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let i = 0;
 
-  setInterval(() => {
+  if (!reduced) setInterval(() => {
     i = (i + 1) % items.length;
     const apply = () => {
       el.textContent = items[i].suffix;

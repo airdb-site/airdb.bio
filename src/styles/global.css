@@ -5,10 +5,10 @@
   --ground: #f0f4e9;
   --ground-2: #e6ecdb;
   --ink: #1c3326;
-  --ink-soft: #56695a;
-  --leaf: #2f7a4d;
+  --ink-soft: #4b5e4f;
+  --leaf: #286a42;
   --leaf-deep: #1f5a37;
-  --pollen: #c98f16;
+  --pollen: #8a6009;
   --line: #c9d4bd;
   --card: #f7faf1;
   /* canvas 孢子粒子的 rgb 分量 */
@@ -90,8 +90,8 @@ body {
 
 /* ---- 滚动渐显（配合 IntersectionObserver）---- */
 .reveal {
-  opacity: 0;
-  transform: translateY(28px);
+  opacity: 1;
+  transform: none;
   transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
               transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: var(--reveal-delay, 0s);
@@ -110,4 +110,14 @@ body {
     opacity: 1;
     transform: none;
   }
+}
+
+/* Keep all section links available on narrow screens. */
+.mobile-nav { display: none; }
+.skip-link { position: fixed; top: -5rem; left: 1rem; z-index: 100; padding: .75rem; background: var(--ground); }
+.skip-link:focus { top: .5rem; }
+a:focus-visible { outline: 2px solid var(--leaf); outline-offset: 4px; }
+@media (max-width: 639px) {
+  .mobile-nav { display: flex; justify-content: space-around; gap: .5rem; padding: .5rem 1rem; font-size: .8rem; }
+  [id] { scroll-margin-top: 8rem; }
 }

@@ -19,7 +19,7 @@ src/
 ├── layouts/Layout.astro          # SEO / canonical / hreflang / 页头页脚
 ├── components/
 │   ├── SporeField.astro          # Canvas 孢子粒子（呼吸明灭 · 随主题变色）
-│   └── pages/HomePage.astro      # 首页：词根轮换 Hero + 词根考 + 三大板块 + 站群 + 路线图
+│   └── pages/HomePage.astro      # 首页：词根轮换 Hero + 词根考 + 两大板块 + 站群 + 路线图
 └── pages/
     ├── index.astro               # 中文（默认）
     └── en/index.astro            # English
